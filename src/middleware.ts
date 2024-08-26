@@ -1,5 +1,5 @@
 // Need Prisma edge drivers for this - same with route.ts 'edge' settings
-// export const runtime = 'edge'
+export const runtime = 'experimental-edge'
 export { auth as middleware } from './auth/auth'
 
 // import { NextRequest } from "next/server";
