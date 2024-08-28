@@ -1,12 +1,12 @@
-import { signOut } from "@/auth/auth";
-import { Button } from "./ui/button";
+import { asyncSignOut } from '../auth/actions/signOut'
+import { Button } from './ui/button'
 
-export function SignOutButton () {
+export function SignOutButton() {
   return (
-    <form action={async () => {
-      'use server'
-      await signOut()
-    }}>
+    <form
+      action={async () => {
+        await asyncSignOut()
+      }}>
       <Button>Sign Out</Button>
     </form>
   )

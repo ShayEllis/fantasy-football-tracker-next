@@ -2,9 +2,6 @@ import { ToggleDarkMode } from '@/components/ToggleDarkMode'
 import { LeagueInfoCard } from '@/components/LeagueInfoCard'
 import { TestElement } from '@/components/TestElement'
 import { EditLeague } from '@/components/EditLeague'
-import { SignInButton } from '@/components/SignInButton'
-import { SignInButtonDefault } from '@/components/SignInButtonDefault'
-import { SignOutButton } from '@/components/SignOutButton'
 import { UserAvatar } from '@/components/UserAvatar'
 
 export default function Home() {
@@ -17,9 +14,6 @@ export default function Home() {
       <LeagueInfoCard />
       <TestElement />
       <EditLeague />
-      <SignInButton />
-      <SignInButtonDefault />
-      <SignOutButton />
       <UserAvatar />
     </main>
   )

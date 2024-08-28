@@ -2,7 +2,6 @@
 
 import { useRouter } from 'next/navigation'
 import { Button } from './ui/button'
-import { signIn } from '@/auth/auth'
 
 export function SignInButton() {
   const router = useRouter()

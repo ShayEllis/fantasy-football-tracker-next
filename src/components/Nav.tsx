@@ -16,6 +16,7 @@ import { Menu } from 'lucide-react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { usePathname } from 'next/navigation'
+import { SignOutButton } from '@/components/SignOutButton'
 
 export function Navbar({ children }: { children: ReactNode }) {
   return (
@@ -47,7 +48,9 @@ export function NavSideDrawer({ children }: { children: ReactNode }) {
         </SheetHeader>
         <SheetDescription className='sr-only'>Navigation Menu</SheetDescription>
         {children}
-        <SheetFooter className='sm:justify-start'>Sign Out</SheetFooter>
+        <SheetFooter className='sm:justify-start'>
+          <SignOutButton />
+        </SheetFooter>
       </SheetContent>
     </Sheet>
   )
