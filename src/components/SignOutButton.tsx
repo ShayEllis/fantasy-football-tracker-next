@@ -1,3 +1,5 @@
+'use client'
+
 import { asyncSignOut } from '../auth/actions/signOut'
 import { Button } from './ui/button'
 

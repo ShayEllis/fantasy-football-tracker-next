@@ -1,6 +1,5 @@
-import { Nav, Navbar, NavLink } from '@/components/Nav'
+import { Nav, Navbar, NavSideDrawer, NavLink } from '@/components/Nav/Nav'
 import { type ReactNode } from 'react'
-import { NavSideDrawer } from '@/components/Nav'
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (

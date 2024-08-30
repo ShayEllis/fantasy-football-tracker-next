@@ -1,7 +1,5 @@
-'use client'
-
-import { type ReactNode, type ComponentProps } from 'react'
-import footballLogo from '../../public/football-icon.svg'
+import { type ReactNode } from 'react'
+import footballLogo from '../../../public/football-icon.svg'
 import Image from 'next/image'
 import {
   Sheet,
@@ -11,12 +9,10 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from './ui/sheet'
+} from '../ui/sheet'
 import { Menu } from 'lucide-react'
-import Link from 'next/link'
-import { cn } from '@/lib/utils'
-import { usePathname } from 'next/navigation'
 import { SignOutButton } from '@/components/SignOutButton'
+import { AvatarHeading } from '../AvatarHeading'
 
 export function Navbar({ children }: { children: ReactNode }) {
   return (
@@ -44,7 +40,9 @@ export function NavSideDrawer({ children }: { children: ReactNode }) {
       </SheetTrigger>
       <SheetContent className='flex flex-col'>
         <SheetHeader className='text-left'>
-          <SheetTitle className='text-2xl'>User name</SheetTitle>
+          <SheetTitle className='text-2xl'>
+            <AvatarHeading />
+          </SheetTitle>
         </SheetHeader>
         <SheetDescription className='sr-only'>Navigation Menu</SheetDescription>
         {children}
@@ -60,16 +58,4 @@ export function Nav({ children }: { children: ReactNode }) {
   return <nav className='h-full flex flex-col gap-2'>{children}</nav>
 }
 
-export function NavLink(props: Omit<ComponentProps<typeof Link>, 'className'>) {
-  const pathName = usePathname()
-
-  return (
-    <Link
-      {...props}
-      className={cn(
-        'w-1/2 p-4 hover:bg-secondary rounded-md hover:text-secondary-foreground focus-visible:bg-secondary focus-visible:text-secondary-foreground',
-        pathName === props.href && 'bg-secondary text-secondary-foreground'
-      )}
-    />
-  )
-}
+export { NavLink } from './NavLink'
