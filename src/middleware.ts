@@ -1,5 +1,5 @@
 // Need Prisma edge drivers for this - same with route.ts 'edge' settings
-export const runtime = 'experimental-edge'
+// export const runtime = 'edge'
 // Using middleware to protect routes - figure out how to chain?
 // export { auth as middleware } from './auth/auth'
 import { NextRequest, NextResponse } from 'next/server'

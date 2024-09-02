@@ -7,10 +7,9 @@ import { LoaderCircle } from 'lucide-react'
 
 export function AvatarHeading() {
   const session = useContext(SessionContext)
-  console.log('context', session)
 
-  let avatarFallback = ''
-  let username = 'User'
+  let avatarFallback = 'User'
+  let username = ''
 
   if (session && session?.user?.name) {
     avatarFallback = session.user.name[0]
