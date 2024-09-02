@@ -3,17 +3,12 @@ export const runtime = 'experimental-edge'
 // Using middleware to protect routes - figure out how to chain?
 // export { auth as middleware } from './auth/auth'
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from './auth/auth'
+import { getSession } from './auth/actions/getSession'
 
 export default async function middleware(request: NextRequest) {
-  const session = await auth()
+  const session = await getSession()
 
-  console.log(request.nextUrl.pathname)
-
-  if (
-    !session ||
-    (session?.expires && Date.parse(session?.expires) <= Date.now())
-  ) {
+  if (session === null) {
     console.log('middleware redirect')
     return NextResponse.redirect(new URL('/home', request.nextUrl.origin))
   }
