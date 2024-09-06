@@ -1,12 +1,14 @@
-import { ComponentProps, ReactElement } from 'react'
+import { ComponentProps, FC, ReactElement } from 'react'
 import { Input as ShadcnInput } from './ui/input'
 import { Label as ShadcnLabel } from './ui/label'
 
-type InputForFloating = {
+type InputForFloating = Omit<
+  ComponentProps<typeof ShadcnInput>,
+  'className'
+> & {
   type: 'number' | 'text' | 'email' | 'password'
   id: string
   placeholder: string
-  props?: Omit<ComponentProps<'input'>, 'className'> // not working!
 }
 
 export function InputForFloating({
@@ -26,11 +28,10 @@ export function InputForFloating({
   )
 }
 
-type FloatingLabel = {
-  children: ReactElement<typeof InputForFloating>
+type FloatingLabel = Omit<ComponentProps<typeof ShadcnLabel>, 'variant'> & {
+  children: ReactElement<InputForFloating>
   htmlFor: string
   ariaLabel: string
-  props?: Omit<ComponentProps<'label'>, 'variant'>
 }
 
 export function FloatingLabel({

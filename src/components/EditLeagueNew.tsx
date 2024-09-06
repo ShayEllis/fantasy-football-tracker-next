@@ -46,10 +46,8 @@ export function EditLeague() {
 
   console.log(date)
 
-  const floadingLabel = 'm-auto' // update
-
   return (
-    <form className='grid w-full max-w-sm items-center gap-1.5 mx-auto border p-2 rounded'>
+    <form className='grid grid-cols-2 w-full max-w-sm items-center gap-1.5 mx-auto border p-2 rounded'>
       <div>
         <FloatingLabel htmlFor='leagueName' ariaLabel='League Name'>
           <InputForFloating
@@ -65,47 +63,45 @@ export function EditLeague() {
         </FloatingLabel>
       </div>
       <div>
-        <div>
-          <Label htmlFor='draftDate'>Draft Date</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant={'outline'}
-                id='draftDate'
-                className={cn(
-                  'w-[280px] justify-start text-left font-normal',
-                  !date && 'text-muted-foreground'
-                )}>
-                <CalendarIcon className='mr-2 h-4 w-4' />
-                {date ? format(date, 'P') : <span>Pick a date</span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className='w-auto p-0'>
-              <Calendar
-                mode='single'
-                selected={date}
-                onSelect={setDate}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-        <div>
-          <Label htmlFor='platform'>Platform</Label>
-          <Select>
-            <SelectTrigger id='platform' className='w-[180px]'>
-              <SelectValue placeholder='Select a platform' />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value='espn'>ESPN</SelectItem>
-                <SelectItem value='free'>Free</SelectItem>
-                <SelectItem value='sleeper'>Sleeper</SelectItem>
-                <SelectItem value='yahoo'>Yahoo</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
+        <Label htmlFor='draftDate'>Draft Date</Label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant={'outline'}
+              id='draftDate'
+              className={cn(
+                'w-[280px] justify-start text-left font-normal',
+                !date && 'text-muted-foreground'
+              )}>
+              <CalendarIcon className='mr-2 h-4 w-4' />
+              {date ? format(date, 'P') : <span>Pick a date</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className='w-auto p-0'>
+            <Calendar
+              mode='single'
+              selected={date}
+              onSelect={setDate}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+      <div>
+        <Label htmlFor='platform'>Platform</Label>
+        <Select>
+          <SelectTrigger id='platform' className='w-[180px]'>
+            <SelectValue placeholder='Select a platform' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value='espn'>ESPN</SelectItem>
+              <SelectItem value='free'>Free</SelectItem>
+              <SelectItem value='sleeper'>Sleeper</SelectItem>
+              <SelectItem value='yahoo'>Yahoo</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
       </div>
       <div>
         <FloatingLabel htmlFor='teamCount' ariaLabel='Team Count'>
@@ -121,7 +117,7 @@ export function EditLeague() {
       <div>
         <FloatingLabel htmlFor='pickPosition' ariaLabel='Pick Position'>
           <InputForFloating
-            type='number'
+            type='text'
             min={1}
             step={1}
             id='pickPosition'
