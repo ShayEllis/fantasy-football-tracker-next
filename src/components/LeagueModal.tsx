@@ -41,14 +41,14 @@ const formSchema = z.object({
   payout3: z.number().int(),
 })
 
-export function EditLeague() {
+export function LeagueModal() {
   const [date, setDate] = useState<Date>()
 
   console.log(date)
 
   return (
     <form className='grid grid-cols-2 w-full max-w-sm items-center gap-1.5 mx-auto border p-2 rounded'>
-      <div>
+      <div className='col-span-2'>
         <FloatingLabel htmlFor='leagueName' ariaLabel='League Name'>
           <InputForFloating
             type='text'
@@ -57,20 +57,27 @@ export function EditLeague() {
           />
         </FloatingLabel>
       </div>
-      <div>
+      <div className='col-span-2'>
         <FloatingLabel htmlFor='teamName' ariaLabel='Team Name'>
           <InputForFloating type='text' id='teamName' placeholder='Team Name' />
         </FloatingLabel>
       </div>
-      <div>
-        <Label htmlFor='draftDate'>Draft Date</Label>
+      <div className='relative'>
+        <Label
+          htmlFor='draftDate'
+          className={cn(
+            'absolute top-1/2 -translate-y-6 left-3 text-sm',
+            date && 'text-muted-foreground'
+          )}>
+          Draft Date
+        </Label>
         <Popover>
           <PopoverTrigger asChild>
             <Button
               variant={'outline'}
               id='draftDate'
               className={cn(
-                'w-[280px] justify-start text-left font-normal',
+                'w-full justify-start text-left font-normal h-auto pt-7',
                 !date && 'text-muted-foreground'
               )}>
               <CalendarIcon className='mr-2 h-4 w-4' />
@@ -87,11 +94,15 @@ export function EditLeague() {
           </PopoverContent>
         </Popover>
       </div>
-      <div>
-        <Label htmlFor='platform'>Platform</Label>
+      <div className='relative'>
+        <Label
+          htmlFor='platform'
+          className='absolute top-1/2 -translate-y-6 left-3 text-sm'>
+          Platform
+        </Label>
         <Select>
-          <SelectTrigger id='platform' className='w-[180px]'>
-            <SelectValue placeholder='Select a platform' />
+          <SelectTrigger id='platform' className='w-full h-auto pt-7 data-[placeholder]:text-muted-foreground'>
+            <SelectValue placeholder='Select a platform'/>
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
@@ -125,18 +136,7 @@ export function EditLeague() {
           />
         </FloatingLabel>
       </div>
-      <div>
-        <FloatingLabel htmlFor='pickPosition' ariaLabel='Pick Position'>
-          <InputForFloating
-            type='number'
-            min={1}
-            step={1}
-            id='pickPosition'
-            placeholder='Pick Position'
-          />
-        </FloatingLabel>
-      </div>
-      <div>
+      <div className='col-span-2 w-1/2 mx-auto'>
         <FloatingLabel htmlFor='buyIn' ariaLabel='Buy-In'>
           <InputForFloating
             type='number'
