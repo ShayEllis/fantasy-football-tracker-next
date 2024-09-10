@@ -1,7 +1,6 @@
 import { Nav, Navbar, NavSideDrawer, NavLink } from '@/components/Nav/Nav'
 import { type ReactNode } from 'react'
 import { SessionProvider } from '@/auth/SessionProvider'
-import { Session } from 'inspector/promises'
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
@@ -10,9 +9,9 @@ export default function Layout({ children }: { children: ReactNode }) {
         <Navbar>
           <NavSideDrawer>
             <Nav>
-              <NavLink href=''>Test 1</NavLink>
-              <NavLink href=''>Test 2</NavLink>
-              <NavLink href=''>Test 3</NavLink>
+              <NavLink href='/'>Home</NavLink>
+              <NavLink href='/teams'>Teams</NavLink>
+              <NavLink href='/weeklystats'>Weekly Stats</NavLink>
             </Nav>
           </NavSideDrawer>
         </Navbar>

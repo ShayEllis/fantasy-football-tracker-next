@@ -1,18 +1,12 @@
-import { ToggleDarkMode } from '@/components/ToggleDarkMode'
-import { LeagueInfoCard } from '@/components/LeagueInfoCard'
-import { TestElement } from '@/components/TestElement'
-import { LeagueModal } from '@/components/LeagueModal'
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+
 
 export default function Home() {
   return (
     <main className=''>
-      <div className=''>
-        <h1>Home Page</h1>
-      </div>
-      <ToggleDarkMode />
-      <LeagueInfoCard />
-      <TestElement />
-      <LeagueModal />
+      <Button asChild><Link href='/teams'>Teams</Link></Button>
+      <Button asChild><Link href='/weeklystats'>Weekly Stats</Link></Button>
     </main>
   )
 }
