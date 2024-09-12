@@ -1,8 +1,15 @@
 import { Nav, Navbar, NavSideDrawer, NavLink } from '@/components/Nav/Nav'
 import { type ReactNode } from 'react'
 import { SessionProvider } from '@/auth/SessionProvider'
+import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
 
 export default function Layout({ children }: { children: ReactNode }) {
+  if (!cookies().get('authjs.session-token')?.value){
+    console.log('layout redirect')
+    redirect('/signin')
+  }
+
   return (
     <>
       <SessionProvider>
@@ -16,7 +23,9 @@ export default function Layout({ children }: { children: ReactNode }) {
           </NavSideDrawer>
         </Navbar>
       </SessionProvider>
-      <div className='container p-2 h-[1000px]'>{children}</div>
+      <div className='container p-2 h-[1000px]'>
+        {children}
+        </div>
     </>
   )
 }

@@ -33,6 +33,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from './ui/accordion'
+import { formatCurrency } from '@/lib/formatters'
 
 // add server action with zod validaation in path
 
@@ -52,7 +53,7 @@ const formSchema = z.object({
   payout3: z.number().int(),
 })
 
-export function LeagueModal({ variant = 'add' }: { variant: 'add' | 'edit' }) {
+export function LeagueModal({ variant = 'add' }: { variant?: 'add' | 'edit' }) {
   const [date, setDate] = useState<Date>()
   const modalRef = useRef<HTMLDivElement>(null)
 
@@ -69,8 +70,6 @@ export function LeagueModal({ variant = 'add' }: { variant: 'add' | 'edit' }) {
       )
     }
   }
-
-  console.log(variant)
 
   return (
     <Sheet>
@@ -132,7 +131,7 @@ export function LeagueModal({ variant = 'add' }: { variant: 'add' | 'edit' }) {
                   variant={'outline'}
                   id='draftDate'
                   className={cn(
-                    'w-full justify-start text-left font-normal h-auto pt-7',
+                    'w-full justify-start text-left font-normal h-auto pt-7 hover:bg-transparent',
                     !date && 'text-muted-foreground'
                   )}>
                   <CalendarIcon className='mr-2 h-4 w-4' />
@@ -178,7 +177,10 @@ export function LeagueModal({ variant = 'add' }: { variant: 'add' | 'edit' }) {
             </Label>
           </div>
           <div>
-            <FloatingLabel htmlFor='teamCount' ariaLabel='Team Count'>
+            <FloatingLabel
+              htmlFor='teamCount'
+              ariaLabel='Team Count'
+              className='inline'>
               <InputForFloating
                 type='number'
                 min={1}
@@ -207,11 +209,12 @@ export function LeagueModal({ variant = 'add' }: { variant: 'add' | 'edit' }) {
               <InputForFloating
                 type='number'
                 min={1}
-                step={1}
+                step='any'
                 id='buyIn'
                 placeholder='Buy-In'
                 name='buyIn'
                 required
+                defaultValue={54.45}
               />
             </FloatingLabel>
           </div>
@@ -256,7 +259,7 @@ export function LeagueModal({ variant = 'add' }: { variant: 'add' | 'edit' }) {
               <InputForFloating
                 type='number'
                 min={1}
-                step={1}
+                step='any'
                 id='payout1'
                 placeholder='Payout 1'
                 name='payout1'
@@ -268,7 +271,7 @@ export function LeagueModal({ variant = 'add' }: { variant: 'add' | 'edit' }) {
               <InputForFloating
                 type='number'
                 min={1}
-                step={1}
+                step='any'
                 id='payout2'
                 placeholder='Payout 2'
                 name='payout2'
@@ -280,7 +283,7 @@ export function LeagueModal({ variant = 'add' }: { variant: 'add' | 'edit' }) {
               <InputForFloating
                 type='number'
                 min={1}
-                step={1}
+                step='any'
                 id='payout1'
                 placeholder='Payout 3'
                 name='payout3'
