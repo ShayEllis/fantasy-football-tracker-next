@@ -37,12 +37,13 @@ model UserSettings {
   id    String @id @default(cuid())
   theme Theme  @default(SYSTEM)
 
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @unique
 }
 
 model FantasyLeague {
-  leagueName   String    @id
+  id           String    @id @default(cuid())
+  leagueName   String
   teamName     String
   teamCount    Int
   draftDate    DateTime?
@@ -56,23 +57,23 @@ model FantasyLeague {
   payout2      Int?
   payout3      Int?
 
-  User   User?   @relation(fields: [userId], references: [id])
+  User   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String?
 
   weeklyStats WeeklyStats[]
 }
 
 model WeeklyStats {
-  id              String  @default(cuid())
+  id              String   @default(cuid())
   week            Int
-  W_L_Before      String? // what is this?
+  projectedWin    Int?
+  win             Boolean?
   projectedPoints Int?
-  actualPoints    Int?
-  W_L_After       String? // what is this?
-  overallPlace    Int?
+  points          Int?
+  place           Int?
 
-  FantasyLeague           FantasyLeague? @relation(fields: [fantasyLeagueLeagueName], references: [leagueName])
-  fantasyLeagueLeagueName String?
+  FantasyLeague   FantasyLeague? @relation(fields: [fantasyLeagueId], references: [id], onDelete: Cascade)
+  fantasyLeagueId String?
 
   @@id([id, week])
 }

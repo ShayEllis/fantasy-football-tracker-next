@@ -55,7 +55,7 @@ export function NavSideDrawer({ children }: { children: ReactNode }) {
 }
 
 export function Nav({ children }: { children: ReactNode }) {
-  return <nav className='h-full flex flex-col gap-2'>{children}</nav>
+  return <nav className='flex flex-col gap-2'>{children}</nav>
 }
 
 export { NavLink } from './NavLink'

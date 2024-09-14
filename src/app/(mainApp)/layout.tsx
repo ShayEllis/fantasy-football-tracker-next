@@ -3,6 +3,8 @@ import { type ReactNode } from 'react'
 import { SessionProvider } from '@/auth/SessionProvider'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { Separator } from '@/components/ui/separator'
+import { ToggleDarkMode } from '@/components/ToggleDarkMode'
 
 export default function Layout({ children }: { children: ReactNode }) {
   if (!cookies().get('authjs.session-token')?.value) {
@@ -15,11 +17,15 @@ export default function Layout({ children }: { children: ReactNode }) {
       <SessionProvider>
         <Navbar>
           <NavSideDrawer>
-            <Nav>
-              <NavLink href='/'>Home</NavLink>
-              <NavLink href='/teams'>Teams</NavLink>
-              <NavLink href='/weeklystats'>Weekly Stats</NavLink>
-            </Nav>
+            <div className='h-full'>
+              <Nav>
+                <NavLink href='/'>Home</NavLink>
+                <NavLink href='/teams'>Teams</NavLink>
+                <NavLink href='/stats'>Stats</NavLink>
+              </Nav>
+              <Separator className='my-4' />
+              <ToggleDarkMode />
+            </div>
           </NavSideDrawer>
         </Navbar>
       </SessionProvider>
