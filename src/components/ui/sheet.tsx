@@ -42,7 +42,7 @@ const sheetVariants = cva(
         right:
           'inset-y-0 right-0 h-full w-3/4  border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm',
         none:
-          'data-[state=open]:duration-300 w-11/12 m-auto inset-x-0 bottom-1/2 translate-y-1/2 border-t data-[state=closed]:slide-out-to-bottom data-[state=closed]:fade-out data-[state=open]:slide-in-from-bottom data-[state=open]:fade-in sm:w-[512px]',
+          'p-0 data-[state=open]:duration-300 w-11/12 m-auto inset-x-0 bottom-1/2 translate-y-1/2 border-t data-[state=closed]:slide-out-to-bottom data-[state=closed]:fade-out data-[state=open]:slide-in-from-bottom data-[state=open]:fade-in sm:w-[512px]',
       },
     },
     defaultVariants: {

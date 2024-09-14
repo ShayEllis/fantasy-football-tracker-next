@@ -1,3 +1,5 @@
+'use client'
+
 import { TabsContent } from '@radix-ui/react-tabs'
 import { Tabs, TabsList, TabsTrigger } from './ui/tabs'
 import {
@@ -10,16 +12,22 @@ import {
 import { SquarePen } from 'lucide-react'
 import { Button } from './ui/button'
 import { Table, TableBody, TableCell, TableRow } from './ui/table'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export function LeagueInfoCard() {
+  const router = useRouter()
+
   return (
     <Card className='w-[250px]'>
       <Tabs defaultValue='tab1'>
         <CardHeader>
           <div className='flex align-middle justify-between'>
             <CardTitle className='my-auto text-xl'>League Name</CardTitle>
-            <Button variant='outline' className='p-1 h-auto'>
-              <SquarePen className='size-5' />
+            <Button variant='outline' className='p-1 h-auto' asChild>
+              <Link href={`teams/edit/${12}`}>
+                <SquarePen className='size-5' />
+              </Link>
             </Button>
           </div>
           <CardDescription className='text-base pb-1'>
