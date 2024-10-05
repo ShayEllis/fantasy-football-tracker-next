@@ -2,8 +2,10 @@
 
 import {
   ColumnDef,
+  SortingState,
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
 
@@ -15,23 +17,44 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { ArrowDown } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
-export { singleLeagueColumns, type SingleLeagueWeek } from './SingleLeagueColumns'
+export {
+  singleLeagueColumns,
+  type SingleLeagueWeek,
+} from './SingleLeagueColumns'
 
 type DataTableProps<TData, TValue> = {
-  columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  columns: ColumnDef<TData, TValue | any>[]
 }
 
 export function SingleLeagueStatsTable<TData, TValue>({
-  columns,
   data,
+  columns,
 }: DataTableProps<TData, TValue>) {
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: 'week', desc: false },
+  ])
   const table = useReactTable({
     data,
     columns,
+    debugTable: true,
     getCoreRowModel: getCoreRowModel(),
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      sorting,
+    },
+    enableMultiSort: false,
   })
+
+  //access sorting state from the table instance
+  console.log(table.getState().sorting.length)
+  console.log(table.getState().sorting)
 
   return (
     <div className='rounded-md border'>
@@ -42,12 +65,37 @@ export function SingleLeagueStatsTable<TData, TValue>({
               {headerGroup.headers.map((header) => {
                 return (
                   <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                    {header.isPlaceholder ? null : (
+                      <div className='text-center'>
+                        <Button
+                          variant='ghost'
+                          className='relative'
+                          title={
+                            header.column.getCanSort()
+                              ? header.column.getNextSortingOrder() === 'asc'
+                                ? 'Sort ascending'
+                                : header.column.getNextSortingOrder() === 'desc'
+                                ? 'Sort descending'
+                                : 'Clear sort'
+                              : undefined
+                          }
+                          onClick={header.column.getToggleSortingHandler()}>
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                          {header.column.getIsSorted() === 'asc'}
+                          <ArrowDown
+                            className={cn(
+                              'size-4 absolute right-0',
+                              header.column.getIsSorted() === false && 'hidden',
+                              header.column.getIsSorted() === 'desc' &&
+                                'rotate-180'
+                            )}
+                          />
+                        </Button>
+                      </div>
+                    )}
                   </TableHead>
                 )
               })}

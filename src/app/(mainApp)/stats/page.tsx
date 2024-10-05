@@ -1,6 +1,6 @@
 import {
   AllLeaguesStatsTable,
-  AllLeaguesColumns,
+  allLeaguesColumns,
   type League,
 } from '@/components/Tables/AllLeaguesStatsTable/AllLeaguesStatsTable'
 import {
@@ -8,81 +8,15 @@ import {
   singleLeagueColumns,
   type SingleLeagueWeek,
 } from '../../../components/Tables/SingleLeagueStatsTable/SingleLeagueStatsTable'
+import { allLeaguesTestData } from '@/components/Tables/AllLeaguesStatsTable/AllLeaguesColumns'
+import { singleLeagueTestData } from '@/components/Tables/SingleLeagueStatsTable/SingleLeagueColumns'
 
 async function getSingleLeagueData(): Promise<SingleLeagueWeek[]> {
-  return [
-    {
-      week: 1,
-      projectedWin: 45,
-      win: true,
-      projectedPoints: 121,
-      points: 54,
-      place: 2,
-    },
-    {
-      week: 2,
-      projectedWin: 45,
-      win: true,
-      projectedPoints: 121,
-      points: 54,
-      place: 2,
-    },
-    {
-      week: 3,
-      projectedWin: 45,
-      win: true,
-      projectedPoints: 121,
-      points: 54,
-      place: 2,
-    },
-  ]
+  return singleLeagueTestData
 }
 
 async function getAllLeagueData(): Promise<League[]> {
-  return [
-    {
-      leagueName: 'league 1',
-      weekData: [
-        {
-          week: 1,
-          projectedWin: 2,
-          win: true,
-          projectedPoints: 22,
-          points: 2,
-          place: 5,
-        },
-        {
-          week: 2,
-          projectedWin: 2,
-          win: true,
-          projectedPoints: 22,
-          points: 2,
-          place: 5,
-        },
-      ],
-    },
-    {
-      leagueName: 'league 2',
-      weekData: [
-        {
-          week: 1,
-          projectedWin: 2,
-          win: true,
-          projectedPoints: 22,
-          points: 2,
-          place: 5,
-        },
-        {
-          week: 2,
-          projectedWin: 2,
-          win: true,
-          projectedPoints: 22,
-          points: 2,
-          place: 5,
-        },
-      ],
-    },
-  ]
+  return allLeaguesTestData
 }
 
 export default async function WeeklyStats() {
@@ -102,7 +36,7 @@ export default async function WeeklyStats() {
       </div>
       <div className='container mx-auto py-10'>
         <AllLeaguesStatsTable
-          columns={AllLeaguesColumns}
+          columns={allLeaguesColumns}
           data={allLeagueData}
         />
       </div>

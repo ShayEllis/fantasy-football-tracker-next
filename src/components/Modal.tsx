@@ -18,7 +18,6 @@ export function Modal({
 
   const handlePointerDownOutside = (e: CustomEvent) => {
     e.preventDefault()
-    console.log(e)
 
     if (modalRef.current) {
       modalRef.current.classList.add('scale-105')
