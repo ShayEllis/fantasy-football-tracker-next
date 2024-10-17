@@ -1,24 +1,55 @@
 'use server'
 
-import { z } from 'zod'
+import { db } from '@/db/db'
+import { convertToCents } from '@/lib/utils'
+import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
+import { SafeParseError, z, ZodError } from 'zod'
+
+const name = z.string().min(1).max(26)
+const date = z.preprocess((val) => {
+  if (typeof val === 'string' && val === 'undefined') return null
+  return val
+}, z.string().datetime().nullable().optional())
+const int = z.preprocess((val) => {
+  if (typeof val === 'string' && val === '') return null
+  return val
+}, z.coerce.number().int().positive().nullable())
+const currency = z.preprocess((val) => {
+  if (typeof val === 'string') {
+    if (val === '') return null
+    return convertToCents(val)
+  }
+}, z.coerce.number().positive().nullable())
 
 const formSchema = z.object({
-  leagueName: z.string().min(1).max(26),
-  teamName: z.string().min(1).max(26),
-  draftDate: z.string().datetime(),
+  leagueName: name,
+  teamName: name,
+  draftDate: date.optional(),
   platform: z.enum(['espn', 'free', 'sleeper', 'yahoo']),
-  teamCount: z.number().int(),
-  pickPosition: z.number().int(),
-  buyIn: z.number().int(), // Will x100 to convert and save in cents
-  initialRank: z.number().int(),
-  currentRank: z.number().int(),
-  playoffTeams: z.number().int(),
-  payout1: z.number().int(),
-  payout2: z.number().int(),
-  payout3: z.number().int(),
+  teamCount: int,
+  pickPosition: int.optional(),
+  buyIn: currency,
+  initialRank: int.optional(),
+  currentRank: int.optional(),
+  playoffTeams: int.optional(),
+  payout1: currency.optional(),
+  payout2: currency.optional(),
+  payout3: currency.optional(),
 })
 
-type FormSchema = z.infer<typeof formSchema>
+type FormSchema = Omit<
+  z.infer<typeof formSchema>,
+  'leagueName' | 'teamName' | 'platform' | 'teamCount' | 'buyIn'
+> & {
+  leagueName?: string
+  teamName?: string
+  platform?: 'espn' | 'free' | 'sleeper' | 'yahoo'
+  teamCount?: number
+  buyIn?: number
+  formErrors?: any
+  fieldErrors?: any
+}
 
 const exampleFormData = {
   leagueName: 'test league',
@@ -36,18 +67,40 @@ const exampleFormData = {
   payout3: '23',
 }
 
-export async function addTeam(previousState: {}, formData: FormData) {
+export async function addTeam(
+  previousState: {},
+  formData: FormData
+): Promise<FormSchema> {
   console.log('add team - ')
   const zodResult = formSchema.safeParse(Object.fromEntries(formData.entries()))
+  console.log(zodResult.data)
   if (!zodResult.success) {
-    console.log(zodResult.error)
+    const errorReason = zodResult.error.formErrors
+    console.log(errorReason)
+    return errorReason
   }
+  // const result = await db.fantasyLeague.create({
+  //   data: { ...zodResult.data, User: 'asdf' }, /// *****FIX******
+  // })
+  // console.log('db result:', result)
   return {}
+  // revalidatePath('/teams')
+  // redirect('/teams') // does not unmount modal on parallel intercepting route
 }
 
-export async function updateTeam(previousState: {}, formData: FormData) {
+export async function updateTeam(
+  previousState: {},
+  formData: FormData
+): Promise<FormSchema> {
   console.log('edit team - ')
-  console.log(formSchema.safeParse(formData))
-
+  const zodResult = formSchema.safeParse(Object.fromEntries(formData.entries()))
+  console.log(zodResult.data)
+  if (!zodResult.success) {
+    const errorReason = zodResult.error.formErrors
+    console.log(errorReason)
+    return errorReason
+  }
   return {}
+  // revalidatePath('/teams')
+  // redirect('/teams') // does not unmount modal on parallel intercepting route
 }

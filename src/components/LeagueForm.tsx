@@ -28,22 +28,26 @@ import { useRouter } from 'next/navigation'
 import { useFormState } from 'react-dom'
 
 export function LeagueForm({ variant = 'add' }: { variant?: 'add' | 'edit' }) {
-  const [state, action] = useFormState(addTeam, {})
+  const [error, formAction] = useFormState(
+    variant === 'add' ? addTeam : updateTeam,
+    {}
+  )
   const [date, setDate] = useState<Date | undefined>(undefined)
   const router = useRouter()
 
-  state
+  console.log(error.fieldErrors)
 
   const handleSubmit = () => {
     // check validation
-    console.log('submit needs work')
-    router.back()
+    // console.log('submit needs work')
+    // console.log(error)
+    // if (error.fieldErrors === undefined) router.back()
   }
 
   return (
     <form
       onSubmit={handleSubmit}
-      action={action}
+      action={formAction}
       className={cn(
         'grid grid-cols-2 w-full items-center gap-1.5 mx-auto',
         'border p-6 rounded-xl'
@@ -167,7 +171,7 @@ export function LeagueForm({ variant = 'add' }: { variant?: 'add' | 'edit' }) {
         <FloatingLabel htmlFor='buyIn' ariaLabel='Buy-In'>
           <InputForFloating
             type='number'
-            min={1}
+            min={0.01}
             step='.01'
             id='buyIn'
             placeholder='Buy-In'
@@ -217,7 +221,7 @@ export function LeagueForm({ variant = 'add' }: { variant?: 'add' | 'edit' }) {
         <FloatingLabel htmlFor='payout1' ariaLabel='Payout 1'>
           <InputForFloating
             type='number'
-            min={1}
+            min={0.01}
             step='.01'
             id='payout1'
             placeholder='Payout 1'
@@ -229,7 +233,7 @@ export function LeagueForm({ variant = 'add' }: { variant?: 'add' | 'edit' }) {
         <FloatingLabel htmlFor='payout2' ariaLabel='Payout 2'>
           <InputForFloating
             type='number'
-            min={1}
+            min={0.01}
             step='.01'
             id='payout2'
             placeholder='Payout 2'
@@ -241,9 +245,9 @@ export function LeagueForm({ variant = 'add' }: { variant?: 'add' | 'edit' }) {
         <FloatingLabel htmlFor='payout3' ariaLabel='Payout 3'>
           <InputForFloating
             type='number'
-            min={1}
+            min={0.01}
             step='any'
-            id='.01'
+            id='Payout 3'
             placeholder='Payout 3'
             name='payout3'
           />

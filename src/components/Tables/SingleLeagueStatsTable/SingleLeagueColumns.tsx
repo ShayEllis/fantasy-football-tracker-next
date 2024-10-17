@@ -41,16 +41,6 @@ const columnHelper = createColumnHelper<SingleLeagueWeek>()
 
 export const singleLeagueColumns = [
   columnHelper.accessor('week', {
-    // header: ({ column }) => (
-    //   <div className='text-center'>
-    //     <Button
-    //       variant='ghost'
-    //       onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-    //       Week
-    //       <ArrowUpDown className='ml-2 h-4 w-4' />
-    //     </Button>
-    //   </div>
-    // ),
     header: () => <span>Week</span>,
     cell: (info) => <div className='text-center'>{info.getValue()}</div>,
     sortDescFirst: false,

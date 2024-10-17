@@ -1,9 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-
 import {
-  Column,
   ColumnDef,
   useReactTable,
   getCoreRowModel,
@@ -16,10 +14,11 @@ import {
   sortingFns,
   PartialKeys,
   TableOptionsResolved,
-  type Table,
+  SortingState,
+  getSortedRowModel,
 } from '@tanstack/react-table'
 import {
-  Table as TableElement,
+  Table,
   TableBody,
   TableCell,
   TableHead,
@@ -27,12 +26,23 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
-
 import {
   RankingInfo,
   rankItem,
   compareItems,
 } from '@tanstack/match-sorter-utils'
+import { ArrowDown } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 export { allLeaguesColumns, type League } from './AllLeaguesColumns'
 
@@ -112,11 +122,11 @@ export function AllLeaguesStatsTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [tableData, setTableData] = useState(data)
   const [globalFilter, setGlobalFilter] = useState('')
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: 'leagueName', desc: false },
+    { id: 'week', desc: false },
+  ])
   const [autoResetPageIndex, skipAutoResetPageIndex] = useSkipper()
-
-  useEffect(() => {
-    console.log('all leagues data', tableData)
-  }, [tableData])
 
   // Give our default column cell renderer editing superpowers!
   const defaultColumn: Partial<ColumnDef<TData>> = {
@@ -142,8 +152,10 @@ export function AllLeaguesStatsTable<TData, TValue>({
 
       return (
         <Input
-          className='text-center p-0 h-auto bg-transparent'
+          className='text-center p-0 h-auto bg-transparent border-transparent'
           value={value as string}
+          id={`${id}${index}`}
+          name={`${id}${index}`}
           onChange={(e) => setValue(e.target.value)}
           onBlur={onBlur}
         />
@@ -160,10 +172,13 @@ export function AllLeaguesStatsTable<TData, TValue>({
     defaultColumn,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
     globalFilterFn: 'fuzzy',
     onGlobalFilterChange: setGlobalFilter,
     state: {
       globalFilter,
+      sorting,
     },
     getPaginationRowModel: getPaginationRowModel(),
     autoResetPageIndex,
@@ -175,30 +190,33 @@ export function AllLeaguesStatsTable<TData, TValue>({
         setTableData((old) =>
           old.map((row, index) => {
             if (index === rowIndex) {
-              return {
+              const newRowData = {
                 ...old[rowIndex]!,
                 [columnId]: value,
               }
+              console.log(newRowData)
+              return newRowData
             }
             return row
           })
         )
       },
     },
-    debugTable: true,
   })
 
   return (
-    <div className='p-2'>
+    <div className='p-2 rounded-md border'>
       <div>
         <DebouncedInput
           value={globalFilter ?? ''}
           onChange={(value) => setGlobalFilter(String(value))}
           className='p-2 font-lg shadow border border-block'
           placeholder='Search all columns...'
+          id='globalAllLeaguesSearch'
+          name='globalAllLeaguesSearch'
         />
       </div>
-      <TableElement>
+      <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
@@ -207,15 +225,33 @@ export function AllLeaguesStatsTable<TData, TValue>({
                   <TableHead key={header.id} colSpan={header.colSpan}>
                     {header.isPlaceholder ? null : (
                       <div>
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                        {header.column.getCanFilter() ? (
-                          <div>
-                            <Filter column={header.column} table={table} />
-                          </div>
-                        ) : null}
+                        <Button
+                          variant='ghost'
+                          className='relative'
+                          title={
+                            header.column.getCanSort()
+                              ? header.column.getNextSortingOrder() === 'asc'
+                                ? 'Sort ascending'
+                                : header.column.getNextSortingOrder() === 'desc'
+                                ? 'Sort descending'
+                                : 'Clear sort'
+                              : undefined
+                          }
+                          onClick={header.column.getToggleSortingHandler()}>
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                          {header.column.getIsSorted() === 'asc'}
+                          <ArrowDown
+                            className={cn(
+                              'size-4 absolute right-0',
+                              header.column.getIsSorted() === false && 'hidden',
+                              header.column.getIsSorted() === 'desc' &&
+                                'rotate-180'
+                            )}
+                          />
+                        </Button>
                       </div>
                     )}
                   </TableHead>
@@ -242,42 +278,44 @@ export function AllLeaguesStatsTable<TData, TValue>({
             )
           })}
         </TableBody>
-      </TableElement>
-      <div className='h-2' />
-      <div className='flex items-center gap-2'>
-        <button
+      </Table>
+
+      <div className='flex items-center gap-2 pt-2'>
+        <Button
+          variant='outline'
           className='border rounded p-1'
           onClick={() => table.setPageIndex(0)}
           disabled={!table.getCanPreviousPage()}>
           {'<<'}
-        </button>
-        <button
+        </Button>
+        <Button
+          variant='outline'
           className='border rounded p-1'
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}>
           {'<'}
-        </button>
-        <button
+        </Button>
+        <span className='flex items-center gap-1'>
+          <div>Page</div>
+          {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+        </span>
+        <Button
+          variant='outline'
           className='border rounded p-1'
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}>
           {'>'}
-        </button>
-        <button
+        </Button>
+        <Button
+          variant='outline'
           className='border rounded p-1'
           onClick={() => table.setPageIndex(table.getPageCount() - 1)}
           disabled={!table.getCanNextPage()}>
           {'>>'}
-        </button>
-        <span className='flex items-center gap-1'>
-          <div>Page</div>
-          <strong>
-            {table.getState().pagination.pageIndex + 1} of{' '}
-            {table.getPageCount()}
-          </strong>
-        </span>
-        <span className='flex items-center gap-1'>
-          | Go to page:
+        </Button>
+
+        {/* <span className='flex items-center gap-1 border-l-2 pl-2'>
+          Go to page:
           <input
             type='number'
             min='1'
@@ -288,72 +326,27 @@ export function AllLeaguesStatsTable<TData, TValue>({
               table.setPageIndex(page)
             }}
             className='border p-1 rounded w-16'
+            id='paginationPageIndex'
+            name='paginationPageIndex'
           />
-        </span>
-        <select
-          value={table.getState().pagination.pageSize}
-          onChange={(e) => {
-            table.setPageSize(Number(e.target.value))
-          }}>
-          {[10, 20, 30, 40, 50].map((pageSize) => (
-            <option key={pageSize} value={pageSize}>
-              Show {pageSize}
-            </option>
-          ))}
-        </select>
+        </span> */}
+
+        <Select  name='paginationPageIndex' onValueChange={(e) => table.setPageSize(Number(e))}>
+          <SelectTrigger className='w-[100px]'>
+            <SelectValue placeholder={`Show ${table.getState().pagination.pageSize}`} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              {[10, 20, 30, 40, 50].map((pageSize) => (
+                <SelectItem key={pageSize} value={pageSize.toString()}>
+                  Show {pageSize}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
       </div>
-      <div>{table.getRowModel().rows.length} Rows</div>
     </div>
-  )
-}
-function Filter({
-  column,
-  table,
-}: {
-  column: Column<any, any>
-  table: Table<any>
-}) {
-  const firstValue = table
-    .getPreFilteredRowModel()
-    .flatRows[0]?.getValue(column.id)
-
-  const columnFilterValue = column.getFilterValue()
-
-  return typeof firstValue === 'number' ? (
-    <div className='flex space-x-2'>
-      <input
-        type='number'
-        value={(columnFilterValue as [number, number])?.[0] ?? ''}
-        onChange={(e) =>
-          column.setFilterValue((old: [number, number]) => [
-            e.target.value,
-            old?.[1],
-          ])
-        }
-        placeholder={`Min`}
-        className='w-24 border shadow rounded'
-      />
-      <input
-        type='number'
-        value={(columnFilterValue as [number, number])?.[1] ?? ''}
-        onChange={(e) =>
-          column.setFilterValue((old: [number, number]) => [
-            old?.[0],
-            e.target.value,
-          ])
-        }
-        placeholder={`Max`}
-        className='w-24 border shadow rounded'
-      />
-    </div>
-  ) : (
-    <input
-      type='text'
-      value={(columnFilterValue ?? '') as string}
-      onChange={(e) => column.setFilterValue(e.target.value)}
-      placeholder={`Search...`}
-      className='w-36 border shadow rounded'
-    />
   )
 }
 
@@ -382,10 +375,11 @@ function DebouncedInput({
   }, [value])
 
   return (
-    <input
+    <Input
       {...props}
       value={value}
       onChange={(e) => setValue(e.target.value)}
+      className='w-1/2'
     />
   )
 }

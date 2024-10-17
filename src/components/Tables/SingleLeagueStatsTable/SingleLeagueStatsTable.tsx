@@ -42,7 +42,6 @@ export function SingleLeagueStatsTable<TData, TValue>({
   const table = useReactTable({
     data,
     columns,
-    debugTable: true,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
@@ -51,10 +50,6 @@ export function SingleLeagueStatsTable<TData, TValue>({
     },
     enableMultiSort: false,
   })
-
-  //access sorting state from the table instance
-  console.log(table.getState().sorting.length)
-  console.log(table.getState().sorting)
 
   return (
     <div className='rounded-md border'>
