@@ -1,11 +1,9 @@
 import { ComponentProps, FC, ReactElement } from 'react'
 import { Input as ShadcnInput } from './ui/input'
 import { Label as ShadcnLabel } from './ui/label'
+import { cn } from '@/lib/utils'
 
-type InputForFloating = Omit<
-  ComponentProps<typeof ShadcnInput>,
-  'className'
-> & {
+type InputForFloating = ComponentProps<typeof ShadcnInput> & {
   type: 'number' | 'text' | 'email' | 'password'
   id: string
   placeholder: string
@@ -15,13 +13,14 @@ export function InputForFloating({
   type,
   id,
   placeholder,
+  className,
   ...props
 }: InputForFloating) {
   return (
     <ShadcnInput
       type={type}
       id={id}
-      className='placeholder:text-transparent h-auto pt-7'
+      className={cn('placeholder:text-transparent h-auto pt-7', className)}
       placeholder={placeholder}
       {...props}
     />

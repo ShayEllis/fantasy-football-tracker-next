@@ -2,41 +2,55 @@
 
 import { db } from '@/db/db'
 import { convertToCents } from '@/lib/utils'
+import { Prisma } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
-import { SafeParseError, z, ZodError } from 'zod'
+import { z } from 'zod'
 
 const name = z.string().min(1).max(26)
 const date = z.preprocess((val) => {
   if (typeof val === 'string' && val === 'undefined') return null
   return val
-}, z.string().datetime().nullable().optional())
+}, z.string().datetime().optional().nullable())
 const int = z.preprocess((val) => {
+  console.log('VAL', val)
   if (typeof val === 'string' && val === '') return null
   return val
-}, z.coerce.number().int().positive().nullable())
+}, z.coerce.number().int().positive().optional().nullable())
+const requiredInt = z.preprocess((val) => {
+  console.log('VAL', val)
+  if (typeof val === 'string' && val === '') return null
+  return val
+}, z.coerce.number().int().positive())
 const currency = z.preprocess((val) => {
   if (typeof val === 'string') {
     if (val === '') return null
     return convertToCents(val)
   }
-}, z.coerce.number().positive().nullable())
+}, z.coerce.number().positive().optional().nullable())
+const requiredCurrency = z.preprocess((val) => {
+  if (typeof val === 'string') {
+    if (val === '') return null
+    return convertToCents(val)
+  }
+}, z.coerce.number().positive())
 
 const formSchema = z.object({
   leagueName: name,
   teamName: name,
-  draftDate: date.optional(),
+  draftDate: date,
   platform: z.enum(['espn', 'free', 'sleeper', 'yahoo']),
-  teamCount: int,
-  pickPosition: int.optional(),
-  buyIn: currency,
-  initialRank: int.optional(),
-  currentRank: int.optional(),
-  playoffTeams: int.optional(),
-  payout1: currency.optional(),
-  payout2: currency.optional(),
-  payout3: currency.optional(),
+  teamCount: requiredInt,
+  pickPosition: int,
+  buyIn: requiredCurrency,
+  initialRank: int,
+  currentRank: int,
+  playoffTeams: int,
+  payout1: currency,
+  payout2: currency,
+  payout3: currency,
 })
+
+type FieldErrors = z.inferFlattenedErrors<typeof formSchema>['fieldErrors']
 
 type FormSchema = Omit<
   z.infer<typeof formSchema>,
@@ -47,8 +61,8 @@ type FormSchema = Omit<
   platform?: 'espn' | 'free' | 'sleeper' | 'yahoo'
   teamCount?: number
   buyIn?: number
-  formErrors?: any
-  fieldErrors?: any
+  formErrors?: string[]
+  fieldErrors?: FieldErrors
 }
 
 const exampleFormData = {
@@ -68,6 +82,7 @@ const exampleFormData = {
 }
 
 export async function addTeam(
+  userId: string | undefined,
   previousState: {},
   formData: FormData
 ): Promise<FormSchema> {
@@ -79,28 +94,41 @@ export async function addTeam(
     console.log(errorReason)
     return errorReason
   }
-  // const result = await db.fantasyLeague.create({
-  //   data: { ...zodResult.data, User: 'asdf' }, /// *****FIX******
-  // })
-  // console.log('db result:', result)
+  console.log(userId)
+  if (userId === undefined) return {} // type error otherwise
+
+  try {
+    const result = await db.fantasyLeague.create({
+      data: { ...zodResult.data, userId: userId },
+    })
+    console.log('db result:', result)
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      if (e.code === 'P2002') {
+        console.log(
+          'There is a unique constraint violation, a new user cannot be created with this email'
+        )
+        return { fieldErrors: { leagueName: ['League name must be unique'] } }
+      }
+    }
+  }
+
   return {}
   // revalidatePath('/teams')
-  // redirect('/teams') // does not unmount modal on parallel intercepting route
 }
 
 export async function updateTeam(
+  userId: string | undefined,
   previousState: {},
   formData: FormData
 ): Promise<FormSchema> {
   console.log('edit team - ')
   const zodResult = formSchema.safeParse(Object.fromEntries(formData.entries()))
-  console.log(zodResult.data)
   if (!zodResult.success) {
-    const errorReason = zodResult.error.formErrors
+    const errorReason = zodResult.error.flatten()
     console.log(errorReason)
     return errorReason
   }
   return {}
   // revalidatePath('/teams')
-  // redirect('/teams') // does not unmount modal on parallel intercepting route
 }

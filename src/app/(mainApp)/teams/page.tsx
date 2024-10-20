@@ -1,3 +1,4 @@
+import { getSession } from '@/auth/actions/getSession'
 import { LeagueInfoCard } from '@/components/LeagueInfoCard'
 import { Button } from '@/components/ui/button'
 import { db } from '@/db/db'
@@ -5,7 +6,11 @@ import { Plus } from 'lucide-react'
 import Link from 'next/link'
 
 export default async function Teams() {
-  const result = await db.fantasyLeague.findMany()
+  const session = await getSession()
+
+  const result = await db.fantasyLeague.findMany({
+    where: { userId: session?.user?.id },
+  })
   console.log('Teams rendered', result)
 
   return (

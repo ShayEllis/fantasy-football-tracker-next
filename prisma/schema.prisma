@@ -43,7 +43,7 @@ model UserSettings {
 
 model FantasyLeague {
   id           String    @id @default(cuid())
-  leagueName   String    @unique
+  leagueName   String
   teamName     String
   teamCount    Int
   draftDate    DateTime?
@@ -61,6 +61,8 @@ model FantasyLeague {
   userId String
 
   weeklyStats WeeklyStats[]
+
+  @@unique([userId, leagueName])
 }
 
 model WeeklyStats {

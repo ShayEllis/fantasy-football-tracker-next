@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import {
   Accordion,
   AccordionContent,
@@ -26,15 +26,37 @@ import {
 } from './ui/accordion'
 import { useRouter } from 'next/navigation'
 import { useFormState } from 'react-dom'
+import { SessionContext } from '@/auth/SessionProvider'
 
 export function LeagueForm({ variant = 'add' }: { variant?: 'add' | 'edit' }) {
+  const session = useContext(SessionContext)
+
   const [error, formAction] = useFormState(
-    variant === 'add' ? addTeam : updateTeam,
-    {}
+    variant === 'add'
+      ? addTeam.bind(null, session?.user?.id)
+      : updateTeam.bind(null, session?.user?.id),
+    {
+      fieldErrors: {
+        leagueName: ['This is an error'],
+        teamName: ['This is an error'],
+        teamCount: ['This is an error'],
+        draftDate: ['This is an error'],
+        platform: ['This is an error'],
+        buyIn: ['This is an error'],
+        pickPosition: ['This is an error'],
+        playoffTeams: ['This is an error'],
+        initialRank: ['This is an error'],
+        currentRank: ['This is an error'],
+        payout1: ['This is an error'],
+        // payout2: ['This is an error'],
+        payout3: ['This is an error'],
+      },
+    }
   )
   const [date, setDate] = useState<Date | undefined>(undefined)
   const router = useRouter()
 
+  console.log(error)
   console.log(error.fieldErrors)
 
   const handleSubmit = () => {
@@ -49,13 +71,18 @@ export function LeagueForm({ variant = 'add' }: { variant?: 'add' | 'edit' }) {
       onSubmit={handleSubmit}
       action={formAction}
       className={cn(
-        'grid grid-cols-2 w-full items-center gap-1.5 mx-auto',
+        'grid grid-cols-2 w-full gap-1.5 mx-auto',
         'border p-6 rounded-xl'
       )}>
       <h2 className='text-left pb-3 text-lg font-bold'>
         {variant === 'add' ? 'Add League' : 'Edit League'}
       </h2>
-      <div className='col-span-2'>
+      <div
+        className={cn(
+          'col-span-2 relative',
+          error.fieldErrors?.leagueName &&
+            'border rounded-md border-destructive text-destructive mb-7'
+        )}>
         <FloatingLabel htmlFor='leagueName' ariaLabel='League Name'>
           <InputForFloating
             type='text'
@@ -63,12 +90,21 @@ export function LeagueForm({ variant = 'add' }: { variant?: 'add' | 'edit' }) {
             placeholder='League Name'
             name='leagueName'
             required
+            className={
+              error.fieldErrors?.leagueName && 'focus-visible:ring-destructive'
+            }
             disabled={variant === 'edit'}
             // defaultValue={'asdfasdf'} // ****** use this to set values for edit modal? ******
           />
         </FloatingLabel>
+        <FieldError errorMsgArr={error?.fieldErrors?.leagueName} />
       </div>
-      <div className='col-span-2'>
+      <div
+        className={cn(
+          'col-span-2 relative',
+          error.fieldErrors?.teamName &&
+            'border rounded-md border-destructive text-destructive mb-7'
+        )}>
         <FloatingLabel htmlFor='teamName' ariaLabel='Team Name'>
           <InputForFloating
             type='text'
@@ -76,18 +112,31 @@ export function LeagueForm({ variant = 'add' }: { variant?: 'add' | 'edit' }) {
             placeholder='Team Name'
             name='teamName'
             required
+            className={
+              error.fieldErrors?.teamName && 'focus-visible:ring-destructive'
+            }
           />
         </FloatingLabel>
+        <FieldError errorMsgArr={error?.fieldErrors?.teamName} />
       </div>
-      <div className='relative'>
+      <div
+        className={cn(
+          'relative',
+          error.fieldErrors?.platform && 'mb-7',
+          error.fieldErrors?.draftDate &&
+            'border rounded-md border-destructive text-destructive mb-7'
+        )}>
         <Label
           htmlFor='draftDate'
           className={cn(
             'absolute top-1/2 -translate-y-6 left-3 text-sm',
-            date && 'text-muted-foreground'
+            date && 'text-primary/75',
+            (date && error.fieldErrors?.draftDate) && 'text-destructive/75'
+
           )}>
           Draft Date
         </Label>
+        <FieldError errorMsgArr={error?.fieldErrors?.draftDate} />
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -95,7 +144,9 @@ export function LeagueForm({ variant = 'add' }: { variant?: 'add' | 'edit' }) {
               id='draftDate'
               className={cn(
                 'w-full justify-start text-left font-normal h-auto pt-7 hover:bg-transparent',
-                !date && 'text-muted-foreground'
+                error.fieldErrors?.draftDate && 'hover:text-destructive',
+                !date && 'text-primary/75',
+                (!date && error.fieldErrors?.draftDate) && 'text-destructive/75'
               )}>
               <CalendarIcon className='mr-2 h-4 w-4' />
               {date ? format(date, 'P') : <span>Pick a date</span>}
@@ -118,14 +169,26 @@ export function LeagueForm({ variant = 'add' }: { variant?: 'add' | 'edit' }) {
           className='hidden'
         />
       </div>
-      <div>
+      <div
+        className={cn(
+          'relative',
+          error.fieldErrors?.platform &&
+            'border rounded-md border-destructive text-destructive mb-7'
+        )}>
         <Label
           htmlFor='platform'
-          className='relative w-full before:top-1/2 before:absolute before:-translate-y-6 before:left-3 before:text-sm before:content-["Platform"] text-muted-foreground has-[option[value=""]:checked]:text-primary '>
+          className={cn(
+            'relative w-full before:top-1/2 before:absolute before:-translate-y-6 before:left-3 before:text-sm before:content-["Platform"] text-primary/75 has-[option[value=""]:checked]:text-primary',
+            error.fieldErrors?.platform &&
+              'has-[option[value=""]:checked]:text-destructive text-destructive/75'
+          )}>
           <Select name='platform' required>
             <SelectTrigger
               id='platform'
-              className='w-full h-auto pt-7 text-primary data-[placeholder]:text-muted-foreground'>
+              className={cn(
+                'w-full h-auto pt-7 text-primary data-[placeholder]:text-primary/75',
+                error.fieldErrors?.platform && 'text-destructive data-[placeholder]:text-destructive/75'
+              )}>
               <SelectValue placeholder='Select a platform' />
             </SelectTrigger>
             <SelectContent>
@@ -138,8 +201,14 @@ export function LeagueForm({ variant = 'add' }: { variant?: 'add' | 'edit' }) {
             </SelectContent>
           </Select>
         </Label>
+        <FieldError errorMsgArr={error?.fieldErrors?.platform} />
       </div>
-      <div>
+      <div
+        className={cn(
+          'relative',
+          error.fieldErrors?.teamCount &&
+            'border rounded-md border-destructive text-destructive mb-7'
+        )}>
         <FloatingLabel
           htmlFor='teamCount'
           ariaLabel='Team Count'
@@ -152,10 +221,19 @@ export function LeagueForm({ variant = 'add' }: { variant?: 'add' | 'edit' }) {
             placeholder='Team Count'
             name='teamCount'
             required
+            className={
+              error.fieldErrors?.teamCount && 'focus-visible:ring-destructive'
+            }
           />
         </FloatingLabel>
+        <FieldError errorMsgArr={error?.fieldErrors?.teamCount} />
       </div>
-      <div>
+      <div
+        className={cn(
+          'relative',
+          error.fieldErrors?.pickPosition &&
+            'border rounded-md border-destructive text-destructive mb-7'
+        )}>
         <FloatingLabel htmlFor='pickPosition' ariaLabel='Pick Position'>
           <InputForFloating
             type='number'
@@ -164,10 +242,19 @@ export function LeagueForm({ variant = 'add' }: { variant?: 'add' | 'edit' }) {
             id='pickPosition'
             placeholder='Pick Position'
             name='pickPosition'
+            className={
+              error.fieldErrors?.pickPosition && 'focus-visible:ring-destructive'
+            }
           />
         </FloatingLabel>
+        <FieldError errorMsgArr={error?.fieldErrors?.pickPosition} />
       </div>
-      <div className='col-span-2 w-1/2 mx-auto'>
+      <div
+        className={cn(
+          'col-span-2 w-1/2 mx-auto relative',
+          error.fieldErrors?.buyIn &&
+            'border rounded-md border-destructive text-destructive mb-7'
+        )}>
         <FloatingLabel htmlFor='buyIn' ariaLabel='Buy-In'>
           <InputForFloating
             type='number'
@@ -177,11 +264,20 @@ export function LeagueForm({ variant = 'add' }: { variant?: 'add' | 'edit' }) {
             placeholder='Buy-In'
             name='buyIn'
             required
+            className={
+              error.fieldErrors?.buyIn && 'focus-visible:ring-destructive'
+            }
             // defaultValue={54.45}
           />
         </FloatingLabel>
+        <FieldError errorMsgArr={error?.fieldErrors?.buyIn} />
       </div>
-      <div>
+      <div
+        className={cn(
+          'relative',
+          error.fieldErrors?.initialRank &&
+            'border rounded-md border-destructive text-destructive mb-7'
+        )}>
         <FloatingLabel htmlFor='initialRank' ariaLabel='Initial Rank'>
           <InputForFloating
             type='number'
@@ -190,10 +286,19 @@ export function LeagueForm({ variant = 'add' }: { variant?: 'add' | 'edit' }) {
             id='initialRank'
             placeholder='Initial Rank'
             name='initialRank'
+            className={
+              error.fieldErrors?.initialRank && 'focus-visible:ring-destructive'
+            }
           />
         </FloatingLabel>
+        <FieldError errorMsgArr={error?.fieldErrors?.initialRank} />
       </div>
-      <div>
+      <div
+        className={cn(
+          'relative',
+          error.fieldErrors?.currentRank &&
+            'border rounded-md border-destructive text-destructive mb-7'
+        )}>
         <FloatingLabel htmlFor='currentRank' ariaLabel='Current Rank'>
           <InputForFloating
             type='number'
@@ -202,10 +307,19 @@ export function LeagueForm({ variant = 'add' }: { variant?: 'add' | 'edit' }) {
             id='currentRank'
             placeholder='Current Rank'
             name='currentRank'
+            className={
+              error.fieldErrors?.currentRank && 'focus-visible:ring-destructive'
+            }
           />
         </FloatingLabel>
+        <FieldError errorMsgArr={error?.fieldErrors?.currentRank} />
       </div>
-      <div>
+      <div
+        className={cn(
+          'relative',
+          error.fieldErrors?.playoffTeams &&
+            'border rounded-md border-destructive text-destructive mb-7'
+        )}>
         <FloatingLabel htmlFor='playoffTeams' ariaLabel='Playoff Teams'>
           <InputForFloating
             type='number'
@@ -214,10 +328,19 @@ export function LeagueForm({ variant = 'add' }: { variant?: 'add' | 'edit' }) {
             id='playoffTeams'
             placeholder='Playoff Teams'
             name='playoffTeams'
+            className={
+              error.fieldErrors?.playoffTeams && 'focus-visible:ring-destructive'
+            }
           />
         </FloatingLabel>
+        <FieldError errorMsgArr={error?.fieldErrors?.playoffTeams} />
       </div>
-      <div>
+      <div
+        className={cn(
+          'relative',
+          error.fieldErrors?.payout1 &&
+            'border rounded-md border-destructive text-destructive mb-7'
+        )}>
         <FloatingLabel htmlFor='payout1' ariaLabel='Payout 1'>
           <InputForFloating
             type='number'
@@ -226,10 +349,19 @@ export function LeagueForm({ variant = 'add' }: { variant?: 'add' | 'edit' }) {
             id='payout1'
             placeholder='Payout 1'
             name='payout1'
+            className={
+              error.fieldErrors?.payout1 && 'focus-visible:ring-destructive'
+            }
           />
         </FloatingLabel>
+        <FieldError errorMsgArr={error?.fieldErrors?.payout1} />
       </div>
-      <div>
+      <div
+        className={cn(
+          'relative',
+          error.fieldErrors?.payout2 &&
+            'border rounded-md border-destructive text-destructive mb-7'
+        )}>
         <FloatingLabel htmlFor='payout2' ariaLabel='Payout 2'>
           <InputForFloating
             type='number'
@@ -238,10 +370,19 @@ export function LeagueForm({ variant = 'add' }: { variant?: 'add' | 'edit' }) {
             id='payout2'
             placeholder='Payout 2'
             name='payout2'
+            className={
+              error.fieldErrors?.payout2 && 'focus-visible:ring-destructive'
+            }
           />
         </FloatingLabel>
+        <FieldError errorMsgArr={error?.fieldErrors?.payout2} />
       </div>
-      <div>
+      <div
+        className={cn(
+          'relative',
+          error.fieldErrors?.payout3 &&
+            'border rounded-md border-destructive text-destructive mb-7'
+        )}>
         <FloatingLabel htmlFor='payout3' ariaLabel='Payout 3'>
           <InputForFloating
             type='number'
@@ -250,8 +391,12 @@ export function LeagueForm({ variant = 'add' }: { variant?: 'add' | 'edit' }) {
             id='Payout 3'
             placeholder='Payout 3'
             name='payout3'
+            className={
+              error.fieldErrors?.payout3 && 'focus-visible:ring-destructive'
+            }
           />
         </FloatingLabel>
+        <FieldError errorMsgArr={error?.fieldErrors?.payout3} />
       </div>
       {variant === 'edit' && (
         <Accordion
@@ -275,5 +420,17 @@ export function LeagueForm({ variant = 'add' }: { variant?: 'add' | 'edit' }) {
         Submit
       </Button>
     </form>
+  )
+}
+
+const FieldError = ({ errorMsgArr }: { errorMsgArr: string[] | undefined }) => {
+  return (
+    <div>
+      {errorMsgArr && (
+        <span className='text-destructive absolute left-4 bottom-[-1.75rem]'>
+          {errorMsgArr[0]}
+        </span>
+      )}
+    </div>
   )
 }

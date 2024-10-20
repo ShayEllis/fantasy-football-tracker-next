@@ -15,7 +15,7 @@ const labelVariants = cva(
             before:transition-all before:content-[attr(aria-label)] before:absolute before:pointer-events-none before:top-1/2 before:-translate-y-1/2 before:left-3 before:text-lg
             has-[input:focus]:before:text-sm has-[input:autofill]:before:text-sm has-[:not(input:placeholder-shown)]:before:text-sm
             has-[input:focus]:before:-translate-y-6 has-[input:autofill]:before:-translate-y-6 has-[:not(input:placeholder-shown)]:before:-translate-y-6
-            has-[input:focus]:before:text-muted-foreground has-[input:autofill]:before:text-muted-foreground has-[:not(input:placeholder-shown)]:before:text-muted-foreground`,
+            has-[input:focus]:before:opacity-75 has-[input:autofill]:before:opacity-75 has-[:not(input:placeholder-shown)]:before:opacity-75`,
       },
     },
   }
