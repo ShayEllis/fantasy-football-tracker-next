@@ -4,8 +4,8 @@ const CURRENCY_FORMATTER = new Intl.NumberFormat('en-US', {
   minimumFractionDigits: 0,
 })
 
-export function formatCurrency(amount: number) {
-  return CURRENCY_FORMATTER.format(amount)
+export function formatCurrencyFromCents(amount: number) {
+  return CURRENCY_FORMATTER.format(amount / 100)
 }
 
 export function formatNumber(number: number) {

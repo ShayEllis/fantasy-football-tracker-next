@@ -6,7 +6,10 @@ import { Prisma } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
-const name = z.string().min(1).max(26)
+const name = z
+  .string()
+  .min(1, { message: 'Must contain at least 1 character' })
+  .max(26, { message: 'Can contain at most 26 characters' })
 const date = z.preprocess((val) => {
   if (typeof val === 'string' && val === 'undefined') return null
   return val
@@ -15,30 +18,32 @@ const int = z.preprocess((val) => {
   console.log('VAL', val)
   if (typeof val === 'string' && val === '') return null
   return val
-}, z.coerce.number().int().positive().optional().nullable())
+}, z.coerce.number().int().positive({ message: 'Must be greater than 0' }).optional().nullable())
 const requiredInt = z.preprocess((val) => {
   console.log('VAL', val)
   if (typeof val === 'string' && val === '') return null
   return val
-}, z.coerce.number().int().positive())
+}, z.coerce.number().int().positive({ message: 'Must be greater than 0' }))
 const currency = z.preprocess((val) => {
   if (typeof val === 'string') {
     if (val === '') return null
     return convertToCents(val)
   }
-}, z.coerce.number().positive().optional().nullable())
+}, z.coerce.number().positive({ message: 'Must be greater than 0' }).optional().nullable())
 const requiredCurrency = z.preprocess((val) => {
   if (typeof val === 'string') {
     if (val === '') return null
     return convertToCents(val)
   }
-}, z.coerce.number().positive())
+}, z.coerce.number().positive({ message: 'Must be greater than 0' }))
 
 const formSchema = z.object({
   leagueName: name,
   teamName: name,
   draftDate: date,
-  platform: z.enum(['espn', 'free', 'sleeper', 'yahoo']),
+  platform: z.enum(['espn', 'free', 'sleeper', 'yahoo'], {
+    message: 'Required',
+  }),
   teamCount: requiredInt,
   pickPosition: int,
   buyIn: requiredCurrency,
@@ -52,7 +57,7 @@ const formSchema = z.object({
 
 type FieldErrors = z.inferFlattenedErrors<typeof formSchema>['fieldErrors']
 
-type FormSchema = Omit<
+export type FormSchema = Omit<
   z.infer<typeof formSchema>,
   'leagueName' | 'teamName' | 'platform' | 'teamCount' | 'buyIn'
 > & {
@@ -112,9 +117,8 @@ export async function addTeam(
       }
     }
   }
-
+  revalidatePath('/teams')
   return {}
-  // revalidatePath('/teams')
 }
 
 export async function updateTeam(
@@ -129,6 +133,6 @@ export async function updateTeam(
     console.log(errorReason)
     return errorReason
   }
+  revalidatePath('/teams')
   return {}
-  // revalidatePath('/teams')
 }

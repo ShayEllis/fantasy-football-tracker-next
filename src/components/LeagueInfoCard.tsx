@@ -14,8 +14,11 @@ import { Button } from './ui/button'
 import { Table, TableBody, TableCell, TableRow } from './ui/table'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { type FantasyLeague } from '@prisma/client'
+import { format } from 'date-fns'
+import { formatCurrencyFromCents } from '@/lib/formatters'
 
-export function LeagueInfoCard() {
+export function LeagueInfoCard({ leagueInfo }: { leagueInfo: FantasyLeague }) {
   const router = useRouter()
 
   return (
@@ -23,15 +26,17 @@ export function LeagueInfoCard() {
       <Tabs defaultValue='tab1'>
         <CardHeader>
           <div className='flex align-middle justify-between'>
-            <CardTitle className='my-auto text-xl'>League Name</CardTitle>
+            <CardTitle className='my-auto text-xl truncate'>
+              {leagueInfo.leagueName}
+            </CardTitle>
             <Button variant='outline' className='p-1 h-auto' asChild>
-              <Link href={`teams/edit/${12}`}>
+              <Link href={`teams/edit/${leagueInfo.id}`}>
                 <SquarePen className='size-5' />
               </Link>
             </Button>
           </div>
           <CardDescription className='text-base pb-1'>
-            Team Name
+            {leagueInfo.teamName}
           </CardDescription>
         </CardHeader>
         <TabsList className='w-full flex mb-1'>
@@ -48,28 +53,33 @@ export function LeagueInfoCard() {
               <TableBody>
                 <TableRow>
                   <TableCell colSpan={2} className='text-center'>
-                    {`${'Test'} - Team`}
+                    {`${leagueInfo.teamCount} - Team`}
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell>Draft Date:</TableCell>
-                  <TableCell>{'08/07/2024'}</TableCell>
+                  <TableCell className='w-1/2'>Draft Date:</TableCell>
+                  <TableCell>
+                    {leagueInfo.draftDate && format(leagueInfo.draftDate, 'P')}
+                  </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Platform:</TableCell>
-                  <TableCell>{'Free'}</TableCell>
+                  <TableCell>{leagueInfo.platform}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Buy-In:</TableCell>
-                  <TableCell>{'$20.00'}</TableCell>
+                  <TableCell>
+                    {leagueInfo.buyIn &&
+                      formatCurrencyFromCents(leagueInfo.buyIn)}
+                  </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Pick Position:</TableCell>
-                  <TableCell>{'7'}</TableCell>
+                  <TableCell>{leagueInfo.pickPosition}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Playoff Teams:</TableCell>
-                  <TableCell>{'1'}</TableCell>
+                  <TableCell>{leagueInfo.playoffTeams}</TableCell>
                 </TableRow>
               </TableBody>
             </Table>
@@ -80,24 +90,33 @@ export function LeagueInfoCard() {
             <Table className='h-[173px]'>
               <TableBody>
                 <TableRow>
-                  <TableCell>Initial Rank:</TableCell>
-                  <TableCell>{'2'}</TableCell>
+                  <TableCell className='w-1/2'>Initial Rank:</TableCell>
+                  <TableCell>{leagueInfo.initialRank}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>CurrentRank:</TableCell>
-                  <TableCell>{'11'}</TableCell>
+                  <TableCell>{leagueInfo.currentRank}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Payout 1:</TableCell>
-                  <TableCell>{'$100.00'}</TableCell>
+                  <TableCell>
+                    {leagueInfo.payout1 &&
+                      formatCurrencyFromCents(leagueInfo.payout1)}
+                  </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Payout 2:</TableCell>
-                  <TableCell>{'$20.00'}</TableCell>
+                  <TableCell>
+                    {leagueInfo.payout2 &&
+                      formatCurrencyFromCents(leagueInfo.payout2)}
+                  </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>Payout 3:</TableCell>
-                  <TableCell>{'$5.00'}</TableCell>
+                  <TableCell>
+                    {leagueInfo.payout3 &&
+                      formatCurrencyFromCents(leagueInfo.payout3)}
+                  </TableCell>
                 </TableRow>
               </TableBody>
             </Table>
